@@ -37,13 +37,19 @@ class Window(QWidget):
         self.recs_head = dict()
 
         self.choice_date = JewishDate()
+
         self.choice_rec = None
 
         self.setLayout(self.vb)
 
     def paintEvent(self, event):
-        painter = QPainter(self)
+        if self.choice_date < JewishDate(3761, 11, 1):
+            self.choice_date = JewishDate(3761, 11, 1)
 
+        if self.choice_date > JewishDate(9999, 6, 29):
+            self.choice_date = JewishDate(9999, 6, 29)
+
+        painter = QPainter(self)
         self.paint_table(painter)
         self.paint_headers(painter)
         self.paint_date(painter)
@@ -108,7 +114,6 @@ class Window(QWidget):
             start_date.forward()
 
     def keyPressEvent(self, event):
-        jd = JewishDate(self.choice_date.jewish_year, self.choice_date.jewish_month, self.choice_date.jewish_day)
         if event.key() == 16777235:
             moves = - 7
         elif event.key() == Qt.Key_Down:
@@ -119,23 +124,30 @@ class Window(QWidget):
             moves = 1
         else:
             return
-        jd.forward(moves)
-        self.set_date(jd)
+        self.increase_date(moves)
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
-        jd = JewishDate(self.choice_date.jewish_year, self.choice_date.jewish_month, self.choice_date.jewish_day)
         if event.buttons() == QtCore.Qt.LeftButton:
             for index in self.recs:
                 rec = self.recs[index]
                 if rec.x() <= event.x() <= rec.width() + rec.x() and rec.y() <= event.y() <= rec.height() + rec.y():
-                    jd.forward(index - self.choice_rec)
-                    self.set_date(jd)
+                    self.increase_date(index - self.choice_rec)
                     break
 
-    def set_date(self, jd):
-        self.choice_date = JewishDate(jd.jewish_year, jd.jewish_month, jd.jewish_day)
-        self.update()
+    def increase_date(self, increment):
+        try:
+            self.choice_date.forward(increment)
+            self.update()
+        except:
+            pass
+
+    def set_date(self, year, month, day):
+        try:
+            self.choice_date = JewishDate(year, month, day)
+            self.update()
+        except:
+            pass
 
     def init_head_layout(self):
         self.year_up = QPushButton('>')
@@ -203,14 +215,10 @@ class Window(QWidget):
         self.head_layout.addWidget(self.year_up, 1, Qt.AlignLeft)
 
     def year_up_click(self):
-        self.choice_date = JewishDate(
-            self.choice_date.jewish_year + 1, self.choice_date.jewish_month, self.choice_date.jewish_day)
-        self.set_date(self.choice_date)
+        self.set_date(self.choice_date.jewish_year + 1, self.choice_date.jewish_month, self.choice_date.jewish_day)
 
     def year_down_click(self):
-        self.choice_date = JewishDate(
-            self.choice_date.jewish_year - 1, self.choice_date.jewish_month, self.choice_date.jewish_day)
-        self.set_date(self.choice_date)
+        self.set_date(self.choice_date.jewish_year - 1, self.choice_date.jewish_month, self.choice_date.jewish_day)
 
     def month_up_click(self):
         year = self.choice_date.jewish_year
@@ -220,7 +228,7 @@ class Window(QWidget):
         if month == self.choice_date.months_in_jewish_year() + 1:
             month = 1
 
-        self.set_date(JewishDate(year, month, self.choice_date.jewish_day))
+        self.set_date(year, month, self.choice_date.jewish_day)
 
     def month_down_click(self):
         year = self.choice_date.jewish_year
@@ -230,15 +238,13 @@ class Window(QWidget):
         if month == 0:
             month = self.choice_date.months_in_jewish_year()
 
-        self.set_date(JewishDate(year, month, self.choice_date.jewish_day))
+        self.set_date(year, month, self.choice_date.jewish_day)
 
     def day_up_click(self):
-        self.choice_date.forward(1)
-        self.set_date(self.choice_date)
+        self.increase_date(1)
 
     def day_down_click(self):
-        self.choice_date.back(1)
-        self.set_date(self.choice_date)
+        self.increase_date(-1)
 
 
 if __name__ == '__main__':
