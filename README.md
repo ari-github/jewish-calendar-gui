@@ -1,5 +1,9 @@
 # jewish-calendar-gui
 Jewish calendar gui using pyqt5\
-also use python-zmanim (https://pypi.org/project/zmanim/) \
+and python-zmanim (https://pypi.org/project/zmanim/) \
 \
-For use just run calendar.py
+For running the script, just run calendar.py
+\
+\
+![alt text](screenshot0.png)
+

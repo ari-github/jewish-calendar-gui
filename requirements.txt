@@ -1,0 +1,7 @@
+julian==0.14
+memoization==0.3.1
+PyQt5==5.15.1
+PyQt5-sip==12.8.1
+python-dateutil==2.8.1
+six==1.15.0
+zmanim==0.3.1
